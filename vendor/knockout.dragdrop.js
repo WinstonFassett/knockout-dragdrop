@@ -180,8 +180,8 @@
     DragElement.prototype.updatePosition = function (event) {
         var pointer = event.pointer;
         this.$element.offset({
-            'top': pointer.pageY,
-            'left': pointer.pageX
+            'top': pointer.pageY - this.adjustment.top,
+            'left': pointer.pageX - this.adjustment.left
         });
     };
 
