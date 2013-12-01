@@ -169,7 +169,12 @@
             'position': 'fixed',
             'z-index': 9998
         });
-        this.$element.on('selectstart', false);
+        this.$element.on('selectstart', false);  
+        
+        this.adjustment = {
+            top: 0,
+            left: 0
+        };
     }
 
     DragElement.prototype.updatePosition = function (event) {
@@ -458,8 +463,8 @@
                         if (options.element) {
                             dragElement = new DragElement(createTemplateProxyElement());
                         }
-
-                        dragElement.updatePosition(downEvent);
+                        dragElement.adjustment = pointerOffset;
+                        dragElement.updatePosition(startEvent);
 
                         var dragTimer = null;
                         var dropRejected = false;
