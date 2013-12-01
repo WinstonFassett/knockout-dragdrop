@@ -101,3 +101,25 @@ li .label {
 .scroll-while-dragging ul {
     overflow: auto;
 }
+ul.hierarchy {
+    min-height: 400px;
+}
+ul.hierarchy.root {
+    height: 500px;
+    width: 500px;
+    overflow: scroll;
+}
+ul.hierarchy, ul.hierarchy ul {
+    position: relative;
+    height: auto;    
+    min-height: 40px;
+}
+ul.hierarchy li {
+    height: auto;
+}
+.children {
+    background: #ccc;
+    padding: 10px;
+}
+
+

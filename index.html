@@ -7,6 +7,40 @@
     </head>
     <body>
         <div class="demo">
+            <div class="" data-bind="with: hierarchy">
+      
+                <div class="">
+
+                    <ul class="root source hierarchy " data-bind="dropZone: {name: 'hierarchy', drop: dropFromTarget }">
+                    <!-- ko template: {name:'Node', data: node} -->
+                    <!-- /ko -->
+                    </ul>
+                    <script id="Node" type="text/html">
+                        <li data-bind="dragZone: { name: 'hierarchy',
+                                         dragStart: $parent.dragStart,
+                                         dragEnd: $parent.dragEnd
+                                       },
+                                       dragEvents: {
+                                         name: 'sortable',
+                                         dragOver: $parent.reorder
+                                       }">
+                            <input data-bind="value: name, valueUpdate: 'afterkeydown'"/>
+                            <div>Children: <span data-bind="text: children().length"></span></div>
+                            <ul class="children" data-bind="template: {foreach: children, name: 'Node'}, dropZone: { name: 'hierarchy', drop: $root.hierarchy.dropFromTarget, dragEnter: $root.hierarchy.dragEnter }">
+                            </ul>                                       
+                        </li>
+                        
+                    </script>  
+
+                    <!-- <ul class="source" data-bind="foreach: source, dropZone: { name: 'simple.target', drop: dropFromTarget }">
+                        <li data-bind="text: $data, dragZone: { name: 'simple.source' }"></li>
+                    </ul> -->
+
+                    <ul class="root hierarchy" data-bind="template: { foreach: target, name: 'Node' }, dropZone: { name: 'hierarchy', drop: dropFromSource }">
+                        <li data-bind="text: $data, dragZone: { name: 'hierarchy' }"></li>
+                    </ul>
+                </div>
+            </div>
             <div class="simple" data-bind="with: simple">
                 <h1>Simple drag and drop between lists</h1>
 
