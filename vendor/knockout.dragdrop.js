@@ -19,6 +19,55 @@
     var first = ko.utils.arrayFirst;
     var filter = ko.utils.arrayFilter;
 
+   function isMouse(e){
+        return (/^mouse/).test(e.type)
+    }
+    function isTouch(e){
+        return (/^touch/).test(e.type)
+    }
+
+    function getPointerInfo(e){
+        var info = {
+            event: e,
+            pointers: [],
+            pointersById: {}           
+        };        
+        e = e.originalEvent || e;
+        info.isTouch = isTouch(e);
+        if(info.isTouch){
+            var touches = e.type=="touchend" ? e.changedTouches : e.targetTouches;
+            ko.utils.arrayPushAll(
+                info.pointers, ko.utils.arrayMap(touches,function(it, i){
+                    var p = {
+                        identifier: it.identifier,
+                        clientX: it.clientX,
+                        clientY: it.clientY,
+                        pageX: it.pageX,
+                        pageY: it.pageY,
+                        target: it.target
+                    }
+                    info.pointersById[p.identifier] = p;
+                    return p;
+                }
+            ));
+        } 
+        if(isMouse(event)) {
+            event = event.originalEvent || event;
+            var mouseInfo = {
+                identifier: 'mouse',
+                clientX: event.clientX,
+                clientY: event.clientY,
+                pageX: event.pageX,
+                pageY: event.pageY,
+                target: event.target
+            };
+            info.pointers.push(mouseInfo);
+            info.pointersById['mouse'] = mouseInfo;
+        }
+        e.pointers = info;
+        return info;
+    }
+
     function Zone(args) {
         this.init(args);
     }
