@@ -140,20 +140,42 @@
                 </div>
             </div>
 
-            <div class="scroll-while-dragging" data-bind="with: scrollWhileDragging">
-                <h1>Scroll while dragging</h1>
+            <div class="sortable" data-bind="with: sortable">
+                <h1>Sortable with indicator</h1>
 
                 <div class="zones">
-                    <ul data-bind="foreach: items, scrollableOnDragOver: 'scroll-while-dragging'">
+                    <ul data-bind="foreach: items">
                         <li data-bind="text: value,
                                        css: { dragging: dragging },
-                                       dragZone: { name: 'scroll-while-dragging',
+                                       dragZone: { name: 'sortable',
                                          dragStart: $parent.dragStart,
                                          dragEnd: $parent.dragEnd
                                        },
-                                       dragEvents: {
-                                         name: 'scroll-while-dragging',
-                                         dragOver: $parent.reorder
+                                       dropZone: {
+                                         name: 'sortable',
+                                         dragOver: $parent.dragOver,
+                                         drop: $parent.drop
+                                       }">
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="scroll-while-dragging" data-bind="with: sortable">
+                <h1>Scroll while dragging</h1>
+
+                <div class="zones">
+                    <ul data-bind="foreach: items, scrollableOnDragOver: 'sortable'">
+                        <li data-bind="text: value,
+                                       css: { dragging: dragging },
+                                       dragZone: { name: 'sortable',
+                                         dragStart: $parent.dragStart,
+                                         dragEnd: $parent.dragEnd
+                                       },
+                                       dropZone: {
+                                         name: 'sortable',
+                                         dragOver: $parent.dragOver,
+                                         drop: $parent.drop
                                        }">
                         </li>
                     </ul>

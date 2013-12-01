@@ -115,12 +115,15 @@
         },
 
         sortable: {
+            scope: 'body',
+            placeholderTemplate: '<li class="placeholder" />',
             items: ko.observableArray(toDraggables(names)),
             dragStart: function (item) {
                 item.dragging(true);
             },
             dragEnd: function (item) {
                 item.dragging(false);
+                $(model.sortable.scope).find('.placeholder').detach();
             },
             reorder: function (event, dragData, zoneData) {
                 if (dragData !== zoneData) {
@@ -128,7 +131,21 @@
                     model.sortable.items.remove(dragData);
                     model.sortable.items.splice(zoneDataIndex, 0, dragData);
                 }
-            }
+            },
+            dragOver: function(event, dragData, zoneData){
+                var tmpl = '<li class="placeholder" />';
+                model.sortable.placeholder = model.sortable.placeholder || $(model.sortable.placeholderTemplate);
+                $(model.sortable.scope).find('.placeholder').detach();
+                var element = event.target;
+                $(element).before(model.sortable.placeholder);
+            },
+            drop: function (dragData, zoneData) {
+                if (dragData !== zoneData) {
+                    model.sortable.items.remove(dragData);
+                    var zoneDataIndex = model.sortable.items.indexOf(zoneData);
+                    model.sortable.items.splice(zoneDataIndex, 0, dragData);
+                }
+            },            
         },
 
         scrollWhileDragging: {
