@@ -110,7 +110,8 @@
     };
 
     Zone.prototype.update = function (event, data) {
-        if (this.isInside(event.pageX, event.pageY)) {
+        var pointer = event.pointer;
+        if (this.isInside(pointer.pageX, pointer.pageY)) {
             if (!this.inside) {
                 this.enter(event, data);
             }
@@ -172,9 +173,10 @@
     }
 
     DragElement.prototype.updatePosition = function (event) {
+        var pointer = event.pointer;
         this.$element.offset({
-            'top': event.pageY,
-            'left': event.pageX
+            'top': pointer.pageY - this.adjustment.top,
+            'left': pointer.pageX - this.adjustment.left
         });
     };
 
@@ -372,15 +374,55 @@
                 });
 
                 $(element).addClass('draggable');
-                $(element).on('mousedown', function (downEvent) {
-                    if (downEvent.which !== 1) {
+
+                $(element).on('mousedown touchstart', function (downEvent) {
+                    
+                    if ($(downEvent.target).is(':input')) {
+                        return;
+                    }
+
+                    var lastPointers, currentPointers;
+
+                    function updatePointers(event){
+                        var p = getPointerInfo(event);
+                        lastPointers = currentPointers;
+                        currentPointers = p;
+                        return p;
+                    }
+
+                    
+                    var downPointers = updatePointers(downEvent);
+                    var downPointer = downPointers.pointers[0];
+                    
+                    var offset = $(element).offset()
+                    var pointerOffset = {
+                        left: downPointer.pageX - offset.left,
+                        top: downPointer.pageY - offset.top
+                    };
+                    
+                    if (!downPointers.isTouch && downEvent.which !== 1) {
                         return true;
                     }
 
                     $(document).on('selectstart.drag', false);
 
-                    function startDragging(startEvent) {
-                        $(element).off('mouseup.startdrag click.startdrag mouseleave.startdrag mousemove.startdrag');
+
+                    function startDragging(startEvent) {                        
+                        var currentPointer, lastPointer;
+
+                        function updatePointer(event){
+                            var p = updatePointers(event);
+                            lastPointer = currentPointer;
+                            event.pointer = currentPointer = p.pointersById[startPointer.identifier] || lastPointer;;
+                            return currentPointer;
+                        }
+
+                        var p = updatePointers(startEvent);
+                        startEvent.pointer = p.pointers[0];
+
+                        var startPointers, startPointer;
+
+                        $(element).off('touchend.startdrag mouseup.startdrag click.startdrag mouseleave.startdrag touchleave.startdrag mousemove.startdrag touchmove.startdrag');
 
                         var dragElement = null;
                         if (!options.element) {
@@ -432,45 +474,60 @@
                                 drag(event);
                             }, 250);
                         }
-
-                        $overlay.on('mousemove.drag', function (moveEvent) {
+                        function doMove(moveEvent){
+                            // moveEvent.stopPropagation();
+                            // moveEvent.preventDefault():
+                            
+                            if(!startPointers){
+                                startPointers = p;
+                                startPointer = p.pointers[0];
+                            }
                             clearTimeout(dragTimer);
-                            dragElement.updatePosition(moveEvent);
+                            updatePointer(moveEvent)
+                            dragElement.updatePosition(moveEvent);                            
                             drag(moveEvent);
                             return false;
+                        }
+
+                        $overlay.on('mousemove.drag touchmove.drag', function (moveEvent) {
+                            doMove(moveEvent);
                         });
 
-                        $overlay.on('mouseup', function (upEvent) {
+                        $overlay.on('mouseup.drag touchend.drag', function (upEvent) {
+                            var pointer = updatePointer(upEvent);
                             clearTimeout(dragTimer);
-                            dragElement.remove();
-                            $overlay.remove();
-                            upEvent.target = document.elementFromPoint(upEvent.clientX, upEvent.clientY);
+                            dragElement.remove();    
+                            $overlay.remove();                        
+                            upEvent.target = document.elementFromPoint(pointer.clientX, pointer.clientY);
                             draggable.drop(upEvent);
 
                             $(document).off('selectstart.drag');
+                            $overlay.off('mousemove.drag touchmove.drag');
+                            $overlay.off('mouseup.drag touchend.drag')
                             return false;
                         });
                     }
 
-                    $(element).one('mouseup.startdrag click.startdrag', function (event) {
-                        $(element).off('mouseleave.startdrag mousemove.startdrag');
+                    $(element).one('mouseup.startdrag touchend.startdrag click.startdrag', function (event) {
+                        $(element).off('mouseleave.startdrag touchleave.startdrag mousemove.startdrag touchmove.startdrag');
                         $(document).off('selectstart.drag');
                         return true;
                     });
 
-                    $(element).on('mousemove.startdrag', function (event) {
+                    $(element).on('mousemove.startdrag touchmove.startdrag', function (event) {
                         if ($(event.target).is(':input')) {
                             return;
                         }
-
-                        var distance = Math.sqrt(Math.pow(downEvent.pageX - event.pageX, 2) +
-                                                 Math.pow(downEvent.pageY - event.pageY, 2));
+                        var pointers = getPointerInfo(event);                        
+                        var now = pointers.pointersById[downPointer.identifier];
+                        var distance = Math.sqrt(Math.pow(downPointer.pageX - now.pageX, 2) +
+                                                 Math.pow(downPointer.pageY - now.pageY, 2));
                         if (distance > 10) {
                             startDragging(event);
                         }
                     });
 
-                    $(element).one('mouseleave.startdrag', function (event) {
+                    $(element).one('mouseleave.startdrag touchleave.startdrag', function (event) {
                         if ($(event.target).is(':input')) {
                             return;
                         }
@@ -504,8 +561,9 @@
                 }
 
                 function dragOver(e) {
-                    x = e.pageX;
-                    y = e.pageY;
+                    var pointer = e.pointer;
+                    x = pointer.pageX;
+                    y = pointer.pageY;
                 }
 
                 function dragLeave(e) {
