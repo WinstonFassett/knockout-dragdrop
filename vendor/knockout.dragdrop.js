@@ -175,8 +175,8 @@
     DragElement.prototype.updatePosition = function (event) {
         var pointer = event.pointer;
         this.$element.offset({
-            'top': pointer.pageY - this.adjustment.top,
-            'left': pointer.pageX - this.adjustment.left
+            'top': pointer.pageY,
+            'left': pointer.pageX
         });
     };
 
@@ -535,7 +535,7 @@
                         startDragging(event);
                     });
 
-                    return true;
+                    return false;
                 });
 
                 ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
