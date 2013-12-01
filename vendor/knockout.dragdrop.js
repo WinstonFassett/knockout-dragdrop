@@ -433,27 +433,7 @@
                             return false;
                         }
 
-                        var $overlay = $('<div class="drag-overlay" unselectable="on">');
-                        $overlay.css({
-                            'z-index': 9999,
-                            'position': 'fixed',
-                            'top': 0,
-                            'left': 0,
-                            'right': 0,
-                            'bottom': 0,
-                            'cursor': 'move',
-                            'background-color': 'white',
-                            'opacity': 0,
-                            'filter': "alpha(opacity=0)",
-                            '-webkit-user-select': 'none',
-                            '-moz-user-select': '-moz-none',
-                            '-ms-user-select': 'none',
-                            '-o-user-select': 'none',
-                            'user-select': 'none'
-                        });
-
-                        $overlay.on('selectstart', false);
-                        $overlay.appendTo('body');
+                        var $overlay = $(window);
 
                         if (options.element) {
                             dragElement = new DragElement(createTemplateProxyElement());
