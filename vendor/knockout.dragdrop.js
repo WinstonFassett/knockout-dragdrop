@@ -459,7 +459,7 @@
                             dragElement = new DragElement(createTemplateProxyElement());
                         }
 
-                        dragElement.updatePosition(downEvent);
+                        dragElement.updatePosition(startEvent);
 
                         var dragTimer = null;
                         var dropRejected = false;
