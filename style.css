@@ -101,3 +101,23 @@ li .label {
 .scroll-while-dragging ul {
     overflow: auto;
 }
+  li.placeholder {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    height: 0;
+    border: none;
+    border-bottom: solid 1px red; }
+    /* line 24, jquery-sortable.css.sass */
+    li.placeholder:before {
+      position: absolute;
+      content: "";
+      width: 0;
+      height: 0;
+      margin-top: -10px;
+      left: -10px;
+      top: 0;
+      border: 10px solid transparent;
+      border-left-color: red;
+      border-right: none; }
+
