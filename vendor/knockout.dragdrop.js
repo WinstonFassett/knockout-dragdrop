@@ -236,7 +236,8 @@
 
         var dropZoneElement = $(event.target).closest('.drop-zone');
         var activeZones = filter(dropZones[name], function (zone) {
-            return zone.active;
+            // temporarily disabling to get multitouch drop working
+            return true || zone.active;
         });
         var winningDropZone = filter(activeZones, function (zone) {
             return zone.$element.is(dropZoneElement);
